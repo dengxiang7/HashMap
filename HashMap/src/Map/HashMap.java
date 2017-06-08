@@ -5,13 +5,13 @@ import java.util.List;
 
 public class HashMap<K,V> implements Map<K,V>{
 	
-	private static float DEFAULT_LOAD_FACTOR=0.75f;
+	private static float DEFAULT_LOAD_FACTOR=0.75f; //负载因子
 
 	private static int defaultLength=16;
 	
-	private Entry<K,V> []table=null;
+	private Entry<K,V> []table=null;  //数据的 数组
 	
-	private int size=0;
+	private int size=0;    //在数组中      已存数据的  数量   不包括链表中的数据。
 	
 	
 	public HashMap(int length,float Loader)
@@ -32,12 +32,13 @@ public class HashMap<K,V> implements Map<K,V>{
 	public V put(K key, V value) {
 		
 		
-		//判断是否扩容
+		//判断是否扩容  依据       数组已存数据大小size  大于     数组原小 * 负载因子
 		if(size>=defaultLength * DEFAULT_LOAD_FACTOR)
 		{
 			 newCapacity();
 		}
 		
+		//通过散列函数   获取存储位置
 		int index=getIndex(key);
 		Entry<K,V> entry=table[index];
 		
@@ -55,19 +56,19 @@ public class HashMap<K,V> implements Map<K,V>{
 	}
 
 	
-	
+	//扩容  大小为2倍
 	private void newCapacity()
 	{
 		Entry <K,V> []newTable=new Entry[2* defaultLength];
 		
-		//在散列
+		//元数据散列 再存在新容器
 		againHash(newTable);
 	}
 	
 	
 	private void againHash(Entry <K,V> []newTable)
 	{
-		
+		//取出数据
 		List<Entry<K,V>> list=new ArrayList<Entry<K,V>>();
 		
 		for(int i=0;i<table.length;i++)
@@ -81,6 +82,7 @@ public class HashMap<K,V> implements Map<K,V>{
 			}
 		}
 		
+		//存储
 		if(list.size()>0)
 		{
 			size=0;
@@ -101,7 +103,7 @@ public class HashMap<K,V> implements Map<K,V>{
 	}
 	
 	
-	
+	//取出原数据
 	private void findEntry(Entry <K,V> entry,List<Entry<K,V>> list)
 	{
 		if(entry !=null && entry.next !=null)
@@ -132,6 +134,7 @@ public class HashMap<K,V> implements Map<K,V>{
 		return getValueByKey(key,table[index]);
 	}
 	
+	//通过key取出数据    如果存在冲突   则 递归 查找 该链表
 	private V getValueByKey(K k,Entry<K,V> entry)
 	{
 		if(k==entry.getKey() || k.equals(entry.getKey()))
@@ -148,6 +151,7 @@ public class HashMap<K,V> implements Map<K,V>{
 		return entry.getValue();
 	}
 	
+	//获取数组的下标， hash函数  使用的是保留取余法。
 	private int getIndex(K k){
 		int m=defaultLength;
 		
@@ -163,7 +167,7 @@ public class HashMap<K,V> implements Map<K,V>{
 	
 
 
-	
+	//内部存储类
 	public class Entry<K,V> implements Map.Entry<K, V>{
 
 		
@@ -171,6 +175,7 @@ public class HashMap<K,V> implements Map<K,V>{
 		
 		V v;
 		
+		//解决冲突使用的链表
 		Entry<K,V> next;
 		
 		public Entry(K key,V value,Entry next)
